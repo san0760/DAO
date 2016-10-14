@@ -1,0 +1,52 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import unti.DBHelper;
+
+import entity.user;
+import entity.userClass;
+
+public class loginDAO
+{
+	public boolean usersLogin(user u) throws Exception
+	{
+		String username=u.getUsername();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		conn = DBHelper.getConnection();
+		String sql = "select * from user";
+		stmt = conn.prepareStatement(sql);
+		rs = stmt.executeQuery();
+		ArrayList<userClass> al = new ArrayList<userClass>();
+		while (rs.next())
+		{
+			userClass uc = new userClass();
+			uc.setId(rs.getInt("id"));
+			uc.setUsername(rs.getString("username"));
+			uc.setPassword(rs.getString("password"));
+			al.add(uc);
+		}
+		String sql2 = "select id from user where username=?";
+		PreparedStatement stmt2 = null;
+		stmt2=conn.prepareStatement(sql2);
+		stmt2.setString(1, username);
+		ResultSet rs2=null;
+		rs2=stmt2.executeQuery();
+		int id =0;
+		while(rs2.next()){
+			 id=rs2.getInt(1);
+		}
+		userClass ucc = al.get(id-1);
+		if (ucc.getUsername().equals(u.getUsername())
+				&& ucc.getPassword().equals(u.getPassword()))
+		{
+			return true;
+		} else
+		{
+			return false;
+		}
+	}
+}
